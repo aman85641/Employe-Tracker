@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard - Employee Tracker</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="brand">Employee Tracker</div>
+            <div>
+                Welcome, <span id="username-display" style="font-weight: 600; margin-right: 1rem;"></span>
+                <button onclick="logout()" class="btn btn-danger" style="width: auto; padding: 0.5rem 1rem;">Logout</button>
+            </div>
+        </header>
+
+        <div class="dashboard-grid">
+            <div class="glass-card">
+                <h2>Attendance Actions</h2>
+                <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                    <button id="btn-checkin" class="btn btn-success">Check In</button>
+                    <button id="btn-checkout" class="btn btn-danger">Check Out</button>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <h2>Daily Report</h2>
+                <div class="form-group" style="margin-top: 1.5rem;">
+                    <textarea id="task-desc" class="form-control" rows="3" placeholder="What did you work on today?"></textarea>
+                </div>
+                <button id="btn-report" class="btn btn-primary">Submit Report</button>
+            </div>
+        </div>
+
+        <div class="glass-card" style="margin-top: 2rem;">
+            <h2>Attendance History</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Check-in Time</th>
+                            <th>Check-out Time</th>
+                            <th>Total Hours</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendance-body">
+                        <!-- Filled by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Guard route
+        if(checkAuth('ROLE_EMPLOYEE')) {
+            loadAttendance();
+        }
+
+        document.getElementById('btn-checkin').addEventListener('click', async () => {
+            try {
+                const res = await fetch('/api/employee/checkin', {
+                    method: 'POST',
+                    headers: getAuthHeader()
+                });
+                const data = await res.json();
+                showAlert(data.message);
+                if(res.ok) loadAttendance();
+            } catch (err) {
+                console.error(err);
+            }
+        });
+
+        document.getElementById('btn-checkout').addEventListener('click', async () => {
+            try {
+                const res = await fetch('/api/employee/checkout', {
+                    method: 'POST',
+                    headers: getAuthHeader()
+                });
+                const data = await res.json();
+                showAlert(data.message);
+                if(res.ok) loadAttendance();
+            } catch (err) {
+                console.error(err);
+            }
+        });
+
+        document.getElementById('btn-report').addEventListener('click', async () => {
+            const desc = document.getElementById('task-desc').value;
+            if(!desc) return showAlert('Please enter a description');
+            
+            try {
+                const res = await fetch('/api/employee/report', {
+                    method: 'POST',
+                    headers: {
+                        ...getAuthHeader(),
+                        'Content-Type': 'text/plain'
+                    },
+                    body: desc
+                });
+                const data = await res.json();
+                showAlert(data.message);
+                if(res.ok) document.getElementById('task-desc').value = '';
+            } catch (err) {
+                console.error(err);
+            }
+        });
+
+        async function loadAttendance() {
+            try {
+                const res = await fetch('/api/employee/attendance', {
+                    headers: getAuthHeader()
+                });
+                if(res.ok) {
+                    const data = await res.json();
+                    const tbody = document.getElementById('attendance-body');
+                    tbody.innerHTML = '';
+                    
+                    data.forEach(item => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${item.date}</td>
+                            <td>${item.checkInTime ? new Date(item.checkInTime).toLocaleTimeString() : '-'}</td>
+                            <td>${item.checkOutTime ? new Date(item.checkOutTime).toLocaleTimeString() : '-'}</td>
+                            <td>${item.totalHours ? item.totalHours : '-'}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    </script>
+</body>
+</html>
