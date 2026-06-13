@@ -1,140 +1,367 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Dashboard - Employee Tracker</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Employee Dashboard</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#003594",
+                        "primary-light": "#1b55d0",
+                        "primary-bg": "#ecf2ff",
+                        secondary: "#006c49",
+                        "secondary-light": "#00a86b",
+                        tertiary: "#810010",
+                        surface: "#f7f9fb",
+                        "surface-card": "rgba(255, 255, 255, 0.92)",
+                        "surface-glass": "rgba(255, 255, 255, 0.75)",
+                        outline: "#cbd5e1",
+                        "on-surface": "#1e293b",
+                        "on-surface-variant": "#475569",
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    backdropBlur: { xs: '2px', glass: '12px' },
+                    animation: {
+                        'pulse-soft': 'pulseSoft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'slide-up': 'slideUp 0.4s ease-out',
+                    },
+                    keyframes: {
+                        pulseSoft: { '0%,100%': { opacity: 1, transform: 'scale(1)' }, '50%': { opacity: 0.7, transform: 'scale(1.05)' } },
+                        slideUp: { from: { opacity: '0', transform: 'translateY(20px)' }, to: { opacity: '1', transform: 'translateY(0)' } }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            transition: all 0.2s ease;
+        }
+
+        body {
+            background: linear-gradient(125deg, #f2f6fc 0%, #eef2f8 100%);
+            min-height: 100vh;
+        }
+
+        .glass-premium {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.02);
+        }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(203, 213, 225, 0.5);
+        }
+
+        .card-hover {
+            transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.08), 0 4px 8px -4px rgba(0, 0, 0, 0.02);
+        }
+
+        .status-badge {
+            backdrop-filter: blur(4px);
+        }
+
+        textarea:focus,
+        input:focus {
+            outline: none;
+        }
+
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
 </head>
-<body>
-    <div class="container">
-        <header>
-            <div class="brand">Employee Tracker</div>
-            <div>
-                Welcome, <span id="username-display" style="font-weight: 600; margin-right: 1rem;"></span>
-                <button onclick="logout()" class="btn btn-danger" style="width: auto; padding: 0.5rem 1rem;">Logout</button>
-            </div>
-        </header>
 
-        <div class="dashboard-grid">
-            <div class="glass-card">
-                <h2>Attendance Actions</h2>
-                <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
-                    <button id="btn-checkin" class="btn btn-success">Check In</button>
-                    <button id="btn-checkout" class="btn btn-danger">Check Out</button>
+<body class="text-on-surface antialiased">
+    <nav class="glass-nav sticky top-0 z-50 transition-shadow">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary-light flex items-center justify-center shadow-md">
+                    <span class="material-symbols-outlined text-white text-xl">badge</span>
+                </div>
+                <h1 class="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">Employee Dashboard</h1>
+            </div>
+            <div class="flex items-center gap-5">
+
+                <div class="text-right hidden sm:block">
+                    <p class="text-xs text-primary/80 font-medium">Welcome</p>
+                    <p class="font-semibold text-sm text-on-surface" id="username-display">Employee</p>
+                    
+                </div>
+                <button id="logoutBtn" onclick="logout()"
+                    class="group flex items-center gap-2 bg-white/60 border border-outline/50 hover:bg-tertiary/10 hover:border-tertiary/30 px-5 py-2.5 rounded-full text-sm font-medium text-tertiary transition-all hover:shadow-sm">
+                    <span class="material-symbols-outlined text-[18px]">logout</span>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 lg:px-8 py-8 lg:py-12 space-y-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-slide-up">
+            <div class="lg:col-span-4 glass-premium rounded-2xl p-7 card-hover flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-2 mb-6">
+                        <div class="relative flex h-3 w-3">
+                            <span
+                                class="animate-pulse-soft absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-secondary"></span>
+                        </div>
+                        <span class="text-[11px] font-bold tracking-[0.2em] text-secondary/80 uppercase">LIVE
+                            SESSION</span>
+                    </div>
+                    <p class="text-5xl font-bold tracking-tight text-on-surface" id="liveClock">--:--:--</p>
+                </div>
+                <div class="mt-8 pt-5 border-t border-outline/30">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold uppercase tracking-wider text-primary/70">Role</span>
+                        <span class="bg-primary/5 text-primary text-xs px-3 py-1 rounded-full">Employee</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="glass-card">
-                <h2>Daily Report</h2>
-                <div class="form-group" style="margin-top: 1.5rem;">
-                    <textarea id="task-desc" class="form-control" rows="3" placeholder="What did you work on today?"></textarea>
+            <div class="lg:col-span-8 glass-premium rounded-2xl p-7 card-hover">
+                <div class="flex items-center justify-between flex-wrap gap-4 mb-5">
+                    <div>
+                        <h2 class="text-xl font-semibold tracking-tight">Attendance hub</h2>
+                        <p class="text-sm text-on-surface-variant/80">Instant shift tracking & smart logging</p>
+                    </div>
+                    <span
+                        class="material-symbols-outlined text-primary/40 text-3xl bg-white/50 p-2 rounded-full">task_alt</span>
                 </div>
-                <button id="btn-report" class="btn btn-primary">Submit Report</button>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-2">
+                    <button id="btn-checkin"
+                        class="flex items-center justify-center gap-3 bg-gradient-to-r from-secondary to-secondary-light text-white font-semibold py-3.5 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-[0.97]">
+                        <span class="material-symbols-outlined">login</span> Clock In
+                    </button>
+                    <button id="btn-checkout"
+                        class="flex items-center justify-center gap-3 bg-white border border-outline/70 text-on-surface font-semibold py-3.5 rounded-xl hover:bg-tertiary/5 hover:border-tertiary/30 transition-all active:scale-[0.97]">
+                        <span class="material-symbols-outlined">logout</span> Clock Out
+                    </button>
+                </div>
             </div>
         </div>
 
-        <div class="glass-card" style="margin-top: 2rem;">
-            <h2>Attendance History</h2>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Check-in Time</th>
-                            <th>Check-out Time</th>
-                            <th>Total Hours</th>
-                        </tr>
-                    </thead>
-                    <tbody id="attendance-body">
-                        <!-- Filled by JS -->
-                    </tbody>
-                </table>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-5 glass-premium rounded-2xl p-7 card-hover">
+                <div class="flex items-center gap-2 mb-6">
+                    <span class="material-symbols-outlined text-primary">edit_document</span>
+                    <h3 class="text-lg font-semibold">Daily progress report</h3>
+                </div>
+                <form id="reportForm" class="space-y-6">
+                    <div>
+                        <label
+                            class="block text-xs font-bold uppercase tracking-wider text-on-surface-variant/80 mb-2">Key
+                            accomplishments</label>
+                        <textarea id="task-desc" rows="5"
+                            class="w-full bg-white/70 border border-outline/50 rounded-xl p-4 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition placeholder:text-outline/60 resize-none"
+                            placeholder="What did you work on today?"></textarea>
+                    </div>
+                    <button type="submit" id="btn-report"
+                        class="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-tertiary/90 to-tertiary text-white font-semibold py-3.5 rounded-xl shadow hover:shadow-md transition active:scale-[0.97]">
+                        <span>Submit Report</span>
+                        <span class="material-symbols-outlined text-[18px]">send</span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="lg:col-span-7 glass-premium rounded-2xl flex flex-col overflow-hidden card-hover">
+                <div class="p-6 border-b border-outline/30 flex justify-between items-center bg-white/30">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">history</span>
+                        <h3 class="text-lg font-semibold">Attendance history</h3>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-surface/20 text-on-surface-variant/80 border-b border-outline/20">
+                            <tr>
+                                <th class="px-6 py-4 text-left font-semibold tracking-wider">Date</th>
+                                <th class="px-6 py-4 text-center font-semibold">Check-in</th>
+                                <th class="px-6 py-4 text-center font-semibold">Check-out</th>
+                                <th class="px-6 py-4 text-right font-semibold">Total hours</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendance-body" class="divide-y divide-outline/20">
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
+
+        <div class="glass-premium rounded-2xl overflow-hidden card-hover">
+            <div class="p-7 border-b border-outline/30 bg-white/20 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">summarize</span>
+                <h3 class="text-lg font-semibold">Submitted Reports</h3>
+            </div>
+            <div id="reportsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-7">
+            </div>
+        </div>
+    </main>
 
     <script src="js/app.js"></script>
     <script>
-        // Guard route
-        if(checkAuth('ROLE_EMPLOYEE')) {
+        if (checkAuth('ROLE_EMPLOYEE')) {
             loadAttendance();
+            loadReports();
         }
+
+        function showToast(message, isError = false) {
+            const toastDiv = document.createElement('div');
+            toastDiv.className = `fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 px-5 py-3 rounded-full shadow-lg text-sm font-medium backdrop-blur-md transition-all duration-300 ${isError ? 'bg-red-500/90 text-white' : 'bg-secondary/90 text-white'} flex items-center gap-2`;
+            toastDiv.innerHTML = `<span class="material-symbols-outlined text-[18px]">${isError ? 'error' : 'done'}</span>${message}`;
+            document.body.appendChild(toastDiv);
+            setTimeout(() => { toastDiv.style.opacity = '0'; setTimeout(() => toastDiv.remove(), 300); }, 2800);
+        }
+
+        function updateLiveClock() {
+            const now = new Date();
+            let hours = now.getHours();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // the hour '0' should be '12'
+            const strHours = String(hours).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const clockElem = document.getElementById('liveClock');
+            if (clockElem) clockElem.innerText = `${strHours}:${minutes}:${seconds} ${ampm}`;
+        }
+        setInterval(updateLiveClock, 1000);
+        updateLiveClock();
 
         document.getElementById('btn-checkin').addEventListener('click', async () => {
             try {
-                const res = await fetch('/api/employee/checkin', {
-                    method: 'POST',
-                    headers: getAuthHeader()
-                });
+                const res = await fetch('/api/employee/checkin', { method: 'POST', headers: getAuthHeader() });
+                if (res.status === 401 || res.status === 403) { logout(); return; }
                 const data = await res.json();
-                showAlert(data.message);
-                if(res.ok) loadAttendance();
-            } catch (err) {
-                console.error(err);
-            }
+                if (res.ok) {
+                    showToast('✅ Clocked in successfully', false);
+                    loadAttendance();
+                } else {
+                    showToast(data.message, true);
+                }
+            } catch (err) { console.error(err); }
         });
 
         document.getElementById('btn-checkout').addEventListener('click', async () => {
             try {
-                const res = await fetch('/api/employee/checkout', {
-                    method: 'POST',
-                    headers: getAuthHeader()
-                });
+                const res = await fetch('/api/employee/checkout', { method: 'POST', headers: getAuthHeader() });
+                if (res.status === 401 || res.status === 403) { logout(); return; }
                 const data = await res.json();
-                showAlert(data.message);
-                if(res.ok) loadAttendance();
-            } catch (err) {
-                console.error(err);
-            }
+                if (res.ok) {
+                    showToast('⏹️ Clocked out successfully', false);
+                    loadAttendance();
+                } else {
+                    showToast(data.message, true);
+                }
+            } catch (err) { console.error(err); }
         });
 
-        document.getElementById('btn-report').addEventListener('click', async () => {
+        document.getElementById('reportForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
             const desc = document.getElementById('task-desc').value;
-            if(!desc) return showAlert('Please enter a description');
-            
+            if (!desc) return showToast('✏️ Please enter a description', true);
+            const submitBtn = document.getElementById('btn-report');
+            submitBtn.innerHTML = `<span class="animate-spin material-symbols-outlined">sync</span> Submitting...`;
+            submitBtn.disabled = true;
+
             try {
                 const res = await fetch('/api/employee/report', {
                     method: 'POST',
-                    headers: {
-                        ...getAuthHeader(),
-                        'Content-Type': 'text/plain'
-                    },
+                    headers: { ...getAuthHeader(), 'Content-Type': 'text/plain' },
                     body: desc
                 });
+                if (res.status === 401 || res.status === 403) { logout(); return; }
                 const data = await res.json();
-                showAlert(data.message);
-                if(res.ok) document.getElementById('task-desc').value = '';
-            } catch (err) {
-                console.error(err);
-            }
+                submitBtn.innerHTML = `<span>Submit Report</span><span class="material-symbols-outlined text-[18px]">send</span>`;
+                submitBtn.disabled = false;
+
+                if (res.ok) {
+                    document.getElementById('task-desc').value = '';
+                    showToast('📄 Report submitted!', false);
+                    loadReports();
+                } else {
+                    showToast(data.message, true);
+                }
+            } catch (err) { console.error(err); submitBtn.disabled = false; }
         });
 
         async function loadAttendance() {
             try {
-                const res = await fetch('/api/employee/attendance', {
-                    headers: getAuthHeader()
-                });
-                if(res.ok) {
+                const res = await fetch('/api/employee/attendance', { headers: getAuthHeader() });
+                if (res.status === 401 || res.status === 403) { logout(); return; }
+                if (res.ok) {
                     const data = await res.json();
                     const tbody = document.getElementById('attendance-body');
+                    if (data.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-on-surface-variant/70 italic">No attendance records found.</td></tr>`;
+                        return;
+                    }
                     tbody.innerHTML = '';
-                    
                     data.forEach(item => {
                         const tr = document.createElement('tr');
+                        tr.className = "hover:bg-primary/5 transition group";
                         tr.innerHTML = `
-                            <td>${item.date}</td>
-                            <td>${item.checkInTime ? new Date(item.checkInTime).toLocaleTimeString() : '-'}</td>
-                            <td>${item.checkOutTime ? new Date(item.checkOutTime).toLocaleTimeString() : '-'}</td>
-                            <td>${item.totalHours ? item.totalHours : '-'}</td>
-                        `;
+              <td class="px-6 py-4 font-semibold text-on-surface group-hover:text-primary transition-colors">${item.date}</td>
+              <td class="px-6 py-4 text-center text-on-surface-variant">${item.checkInTime ? new Date(item.checkInTime).toLocaleTimeString() : '-'}</td>
+              <td class="px-6 py-4 text-center text-on-surface-variant">${item.checkOutTime ? new Date(item.checkOutTime).toLocaleTimeString() : '-'}</td>
+              <td class="px-6 py-4 text-right font-medium text-on-surface">${item.totalHours ? item.totalHours.toFixed(2) + 'h' : '-'}</td>
+            `;
                         tbody.appendChild(tr);
                     });
                 }
-            } catch (err) {
-                console.error(err);
-            }
+            } catch (err) { console.error(err); }
+        }
+
+        async function loadReports() {
+            try {
+                const res = await fetch('/api/employee/reports', { headers: getAuthHeader() });
+                if (res.status === 401 || res.status === 403) { logout(); return; }
+                if (res.ok) {
+                    const data = await res.json();
+                    const container = document.getElementById('reportsGrid');
+                    if (data.length === 0) {
+                        container.innerHTML = `<div class="col-span-full py-10 text-center text-on-surface-variant/70 italic">No reports submitted yet.</div>`;
+                        return;
+                    }
+                    container.innerHTML = data.map(report => `
+            <div class="bg-white/60 backdrop-blur-sm border border-outline/30 p-6 rounded-2xl hover:shadow-md transition-all hover:border-primary/30 group">
+              <div class="flex justify-between items-start mb-3">
+                <span class="text-[11px] font-bold tracking-wider text-primary/70">${report.date}</span>
+                <div class="flex items-center gap-1 bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide status-badge">
+                  <span class="material-symbols-outlined text-[12px]">check_circle</span>
+                  <span>Submitted</span>
+                </div>
+              </div>
+              <p class="text-sm leading-relaxed text-on-surface/80 line-clamp-3" style="white-space: pre-wrap;">${report.taskDescription}</p>
+            </div>
+          `).join('');
+                }
+            } catch (err) { console.error(err); }
         }
     </script>
 </body>
+
 </html>

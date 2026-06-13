@@ -1,128 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Employee Tracker</title>
-    <link rel="stylesheet" href="css/styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: "#003594",
+            "primary-light": "#1b55d0",
+            "primary-bg": "#ecf2ff",
+            secondary: "#006c49",
+            "secondary-light": "#00a86b",
+            tertiary: "#810010",
+            surface: "#f7f9fb",
+            "surface-card": "rgba(255, 255, 255, 0.92)",
+            "surface-glass": "rgba(255, 255, 255, 0.75)",
+            outline: "#cbd5e1",
+            "on-surface": "#1e293b",
+            "on-surface-variant": "#475569",
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          backdropBlur: { xs: '2px', glass: '12px' },
+        }
+      }
+    }
+  </script>
+  <style>
+    * { transition: all 0.2s ease; }
+    body { background: linear-gradient(125deg, #f2f6fc 0%, #eef2f8 100%); min-height: 100vh; }
+    .glass-premium { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.02); }
+    .glass-nav { background: rgba(255, 255, 255, 0.82); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(203, 213, 225, 0.5); }
+    .card-hover { transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s; }
+    .card-hover:hover { transform: translateY(-3px); box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.08), 0 4px 8px -4px rgba(0, 0, 0, 0.02); }
+    .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  </style>
 </head>
-<body>
-    <div class="container">
-        <header>
-            <div class="brand">Admin Dashboard</div>
-            <div>
-                Welcome, <span id="username-display" style="font-weight: 600; margin-right: 1rem;"></span>
-                <button onclick="logout()" class="btn btn-danger" style="width: auto; padding: 0.5rem 1rem;">Logout</button>
-            </div>
-        </header>
-
-        <div class="dashboard-grid">
-            <div class="glass-card">
-                <h2>All Employees</h2>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Username</th>
-                            </tr>
-                        </thead>
-                        <tbody id="employees-body"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="glass-card">
-                <h2>Recent Reports</h2>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Employee</th>
-                                <th>Task Description</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reports-body"></tbody>
-                    </table>
-                </div>
-            </div>
+<body class="text-on-surface antialiased">
+  <nav class="glass-nav sticky top-0 z-50 transition-shadow">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-tertiary to-tertiary flex items-center justify-center shadow-md">
+          <span class="material-symbols-outlined text-white text-xl">admin_panel_settings</span>
         </div>
-
-        <div class="glass-card" style="margin-top: 2rem;">
-            <h2>All Attendances</h2>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Employee</th>
-                            <th>Check-in</th>
-                            <th>Check-out</th>
-                            <th>Total Hours</th>
-                        </tr>
-                    </thead>
-                    <tbody id="attendance-body"></tbody>
-                </table>
-            </div>
+        <h1 class="text-2xl font-bold tracking-tight bg-gradient-to-r from-tertiary to-tertiary bg-clip-text text-transparent">Admin Dashboard</h1>
+      </div>
+      <div class="flex items-center gap-5">
+        <div class="text-right hidden sm:block">
+          <p class="text-xs text-tertiary/80 font-medium">Welcome</p>
+          <p class="font-semibold text-sm text-on-surface" id="username-display">Administrator</p>
         </div>
+        <button id="logoutBtn" onclick="logout()" class="group flex items-center gap-2 bg-white/60 border border-outline/50 hover:bg-tertiary/10 hover:border-tertiary/30 px-5 py-2.5 rounded-full text-sm font-medium text-tertiary transition-all hover:shadow-sm">
+          <span class="material-symbols-outlined text-[18px]">logout</span>
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-7xl mx-auto px-6 lg:px-8 py-8 lg:py-12 space-y-10">
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="glass-premium rounded-2xl flex flex-col overflow-hidden card-hover">
+        <div class="p-6 border-b border-outline/30 flex justify-between items-center bg-white/30">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">groups</span>
+            <h3 class="text-lg font-semibold">All Employees</h3>
+          </div>
+        </div>
+        <div class="overflow-x-auto max-h-[400px]">
+          <table class="min-w-full text-sm">
+            <thead class="bg-surface/20 text-on-surface-variant/80 border-b border-outline/20">
+              <tr>
+                <th class="px-6 py-4 text-left font-semibold tracking-wider">ID</th>
+                <th class="px-6 py-4 text-left font-semibold">Name</th>
+                <th class="px-6 py-4 text-left font-semibold">Email</th>
+              </tr>
+            </thead>
+            <tbody id="employees-body" class="divide-y divide-outline/20">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="glass-premium rounded-2xl flex flex-col overflow-hidden card-hover">
+        <div class="p-6 border-b border-outline/30 flex justify-between items-center bg-white/30">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">history</span>
+            <h3 class="text-lg font-semibold">All Attendances</h3>
+          </div>
+        </div>
+        <div class="overflow-x-auto max-h-[400px]">
+          <table class="min-w-full text-sm">
+            <thead class="bg-surface/20 text-on-surface-variant/80 border-b border-outline/20">
+              <tr>
+                <th class="px-6 py-4 text-left font-semibold tracking-wider">Date</th>
+                <th class="px-6 py-4 text-left font-semibold">Employee</th>
+                <th class="px-6 py-4 text-center font-semibold">Check-in</th>
+                <th class="px-6 py-4 text-center font-semibold">Check-out</th>
+              </tr>
+            </thead>
+            <tbody id="attendance-body" class="divide-y divide-outline/20">
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
-    <script src="js/app.js"></script>
-    <script>
-        // Guard route
-        if(checkAuth('ROLE_ADMIN')) {
-            loadData();
+    <div class="glass-premium rounded-2xl overflow-hidden card-hover">
+      <div class="p-7 border-b border-outline/30 bg-white/20 flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary">summarize</span>
+        <h3 class="text-lg font-semibold">Recent Reports</h3>
+      </div>
+      <div id="reportsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-7">
+      </div>
+    </div>
+  </main>
+
+  <script src="js/app.js"></script>
+  <script>
+    if(checkAuth('ROLE_ADMIN')) {
+        loadData();
+    }
+
+    async function loadData() {
+      try {
+        let res = await fetch('/api/admin/employees', { headers: getAuthHeader() });
+        if (res.status === 401 || res.status === 403) { logout(); return; }
+        if(res.ok) {
+          const emps = await res.json();
+          const tbody = document.getElementById('employees-body');
+          if (emps.length === 0) {
+              tbody.innerHTML = `<tr><td colspan="3" class="px-6 py-8 text-center text-on-surface-variant/70 italic">No employees found.</td></tr>`;
+          } else {
+              tbody.innerHTML = emps.map(emp => `
+                <tr class="hover:bg-primary/5 transition group">
+                  <td class="px-6 py-4 text-on-surface-variant">${emp.id}</td>
+                  <td class="px-6 py-4 font-semibold text-on-surface">${emp.name}</td>
+                  <td class="px-6 py-4 text-on-surface-variant">${emp.email || emp.username || 'N/A'}</td>
+                </tr>
+              `).join('');
+          }
         }
 
-        async function loadData() {
-            try {
-                // Fetch Employees
-                let res = await fetch('/api/admin/employees', { headers: getAuthHeader() });
-                if(res.ok) {
-                    const emps = await res.json();
-                    const tbody = document.getElementById('employees-body');
-                    tbody.innerHTML = '';
-                    emps.forEach(emp => {
-                        tbody.innerHTML += `<tr><td>${emp.id}</td><td>${emp.name}</td><td>${emp.username}</td></tr>`;
-                    });
-                }
-
-                // Fetch Reports
-                res = await fetch('/api/admin/reports', { headers: getAuthHeader() });
-                if(res.ok) {
-                    const reports = await res.json();
-                    const tbody = document.getElementById('reports-body');
-                    tbody.innerHTML = '';
-                    reports.forEach(r => {
-                        tbody.innerHTML += `<tr><td>${r.date}</td><td>${r.user?.name || 'N/A'}</td><td>${r.taskDescription}</td></tr>`;
-                    });
-                }
-
-                // Fetch Attendance
-                res = await fetch('/api/admin/attendance', { headers: getAuthHeader() });
-                if(res.ok) {
-                    const atts = await res.json();
-                    const tbody = document.getElementById('attendance-body');
-                    tbody.innerHTML = '';
-                    atts.forEach(a => {
-                        tbody.innerHTML += `
-                            <tr>
-                                <td>${a.date}</td>
-                                <td>${a.user?.name || 'N/A'}</td>
-                                <td>${a.checkInTime ? new Date(a.checkInTime).toLocaleTimeString() : '-'}</td>
-                                <td>${a.checkOutTime ? new Date(a.checkOutTime).toLocaleTimeString() : '-'}</td>
-                                <td>${a.totalHours ? a.totalHours : '-'}</td>
-                            </tr>
-                        `;
-                    });
-                }
-
-            } catch (err) {
-                console.error(err);
-            }
+        res = await fetch('/api/admin/reports', { headers: getAuthHeader() });
+        if(res.ok) {
+          const reports = await res.json();
+          const container = document.getElementById('reportsGrid');
+          if (reports.length === 0) {
+              container.innerHTML = `<div class="col-span-full py-10 text-center text-on-surface-variant/70 italic">No recent reports.</div>`;
+          } else {
+              container.innerHTML = reports.map(r => `
+                <div class="bg-white/60 backdrop-blur-sm border border-outline/30 p-6 rounded-2xl hover:shadow-md transition-all hover:border-primary/30 group">
+                  <div class="flex justify-between items-start mb-3">
+                    <span class="text-[11px] font-bold tracking-wider text-primary/70">${r.date}</span>
+                    <span class="text-[11px] font-bold tracking-wider bg-primary/10 text-primary px-2 py-1 rounded-full">${r.user?.name || 'N/A'}</span>
+                  </div>
+                  <p class="text-sm leading-relaxed text-on-surface/80 line-clamp-3" style="white-space: pre-wrap;">${r.taskDescription}</p>
+                </div>
+              `).join('');
+          }
         }
-    </script>
+
+        res = await fetch('/api/admin/attendance', { headers: getAuthHeader() });
+        if(res.ok) {
+          const atts = await res.json();
+          const tbody = document.getElementById('attendance-body');
+          if (atts.length === 0) {
+              tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-on-surface-variant/70 italic">No attendance records found.</td></tr>`;
+          } else {
+              tbody.innerHTML = atts.map(a => `
+                <tr class="hover:bg-primary/5 transition group">
+                  <td class="px-6 py-4 font-semibold text-on-surface">${a.date}</td>
+                  <td class="px-6 py-4 text-on-surface-variant">${a.user?.name || 'N/A'}</td>
+                  <td class="px-6 py-4 text-center text-on-surface-variant">${a.checkInTime ? new Date(a.checkInTime).toLocaleTimeString() : '-'}</td>
+                  <td class="px-6 py-4 text-center text-on-surface-variant">${a.checkOutTime ? new Date(a.checkOutTime).toLocaleTimeString() : '-'}</td>
+                </tr>
+              `).join('');
+          }
+        }
+      } catch (err) { console.error(err); }
+    }
+  </script>
 </body>
 </html>

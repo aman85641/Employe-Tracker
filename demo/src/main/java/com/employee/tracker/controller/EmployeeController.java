@@ -35,7 +35,7 @@ public class EmployeeController {
 
     private User getCurrentUser() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userRepository.findByUsername(userDetails.getUsername()).orElse(null);
+        return userRepository.findByEmail(userDetails.getUsername()).orElse(null);
     }
 
     @PostMapping("/checkin")
@@ -109,5 +109,11 @@ public class EmployeeController {
     public ResponseEntity<?> getAttendanceHistory() {
         List<Attendance> attendances = attendanceRepository.findByUserOrderByDateDesc(getCurrentUser());
         return ResponseEntity.ok(attendances);
+    }
+
+    @GetMapping("/reports")
+    public ResponseEntity<?> getReportHistory() {
+        List<Report> reports = reportRepository.findByUserOrderByDateDesc(getCurrentUser());
+        return ResponseEntity.ok(reports);
     }
 }
