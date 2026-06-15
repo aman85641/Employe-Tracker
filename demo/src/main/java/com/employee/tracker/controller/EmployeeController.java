@@ -2,9 +2,11 @@ package com.employee.tracker.controller;
 
 import com.employee.tracker.dto.MessageResponse;
 import com.employee.tracker.model.Attendance;
+import com.employee.tracker.model.Notification;
 import com.employee.tracker.model.Report;
 import com.employee.tracker.model.User;
 import com.employee.tracker.repository.AttendanceRepository;
+import com.employee.tracker.repository.NotificationRepository;
 import com.employee.tracker.repository.ReportRepository;
 import com.employee.tracker.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,9 @@ public class EmployeeController {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    NotificationRepository notificationRepository;
+
     private User getCurrentUser() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return userRepository.findByEmail(userDetails.getUsername()).orElse(null);
@@ -53,6 +58,9 @@ public class EmployeeController {
         attendance.setDate(today);
         attendance.setCheckInTime(LocalDateTime.now());
         attendanceRepository.save(attendance);
+
+        Notification notif = new Notification(user, "CHECK_IN", user.getName() + " checked in.", LocalDateTime.now());
+        notificationRepository.save(notif);
 
         return ResponseEntity.ok(new MessageResponse("Checked in successfully at " + attendance.getCheckInTime()));
     }
@@ -81,6 +89,9 @@ public class EmployeeController {
         
         attendanceRepository.save(attendance);
 
+        Notification notif = new Notification(user, "CHECK_OUT", user.getName() + " checked out. Total hours: " + attendance.getTotalHours(), LocalDateTime.now());
+        notificationRepository.save(notif);
+
         return ResponseEntity.ok(new MessageResponse("Checked out successfully! Total hours: " + attendance.getTotalHours()));
     }
 
@@ -101,6 +112,9 @@ public class EmployeeController {
             report.setTaskDescription(taskDescription);
         }
         reportRepository.save(report);
+
+        Notification notif = new Notification(user, "REPORT", user.getName() + " submitted a progress report.", LocalDateTime.now());
+        notificationRepository.save(notif);
 
         return ResponseEntity.ok(new MessageResponse("Report saved successfully!"));
     }
