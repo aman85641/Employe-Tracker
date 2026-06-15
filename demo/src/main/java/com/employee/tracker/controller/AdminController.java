@@ -32,7 +32,7 @@ public class AdminController {
 
     @GetMapping("/employees")
     public ResponseEntity<?> getAllEmployees() {
-        List<User> employees = userRepository.findAll();
+        List<User> employees = userRepository.findByRole(com.employee.tracker.model.Role.ROLE_EMPLOYEE);
         // Remove passwords from response for security
         employees.forEach(e -> e.setPassword(null));
         return ResponseEntity.ok(employees);
