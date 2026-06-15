@@ -12,6 +12,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootApplication
 public class EmployeeTrackerApplication {
+    @jakarta.annotation.PostConstruct
+    public void init() {
+        // Set the default timezone to IST to ensure check-in/out times match local time
+        java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("Asia/Kolkata"));
+    }
+
     public static void main(String[] args) {
         SpringApplication.run(EmployeeTrackerApplication.class, args);
     }
